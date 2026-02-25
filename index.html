@@ -3,238 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>挪车联系 · 微信通知版</title>
+    <title>挪车联系 · 一键拨号</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(145deg, #f6f9fc 0%, #e9f1f8 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f0f4f8;
             margin: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 16px;
-            box-sizing: border-box;
         }
         .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 48px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255,255,255,0.6);
-            max-width: 420px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
             width: 100%;
-            padding: 40px 24px 36px 24px;
+            padding: 40px 24px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.5);
         }
         .car-icon {
             font-size: 64px;
-            line-height: 1;
-            margin-bottom: 8px;
-            filter: drop-shadow(0 10px 8px rgb(0 100 200 / 0.2));
+            margin-bottom: 16px;
         }
         h1 {
-            font-size: 32px;
-            font-weight: 600;
+            font-size: 28px;
             color: #1e293b;
-            margin: 8px 0 4px 0;
-            letter-spacing: -0.5px;
+            margin: 0 0 8px;
         }
         .sub {
-            color: #475569;
-            font-size: 16px;
-            margin-bottom: 36px;
-            border-bottom: 1px dashed #cbd5e1;
-            padding-bottom: 24px;
-            font-weight: 400;
+            color: #64748b;
+            margin-bottom: 32px;
         }
         .phone-number {
-            background: #ffffff;
-            border-radius: 100px;
-            padding: 18px 20px;
-            margin: 20px 0 28px 0;
-            border: 2px solid #b1d4fe;
-            box-shadow: 0 8px 0 #7e9ec0;
+            background: #eef2ff;
+            border-radius: 50px;
+            padding: 20px;
             font-size: 28px;
             font-weight: 700;
-            color: #0f3b6a;
-            letter-spacing: 2px;
-            word-break: break-word;
+            color: #1e3a8a;
+            border: 2px solid #a5b4fc;
+            margin: 20px 0;
         }
-        .btn-primary {
-            background: #1d4ed8;
-            border: none;
-            border-radius: 100px;
-            padding: 20px 24px;
-            font-size: 22px;
-            font-weight: 600;
+        .call-button {
+            display: block;
+            background: #22c55e;
             color: white;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 10px 0 #0f2b6e;
-            transition: all 0.08s linear;
-            cursor: pointer;
-            border: 1px solid #85b0ff;
-            margin: 20px 0 12px 0;
+            text-decoration: none;
+            padding: 20px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: 600;
+            box-shadow: 0 8px 0 #15803d;
+            transition: 0.1s;
+            margin: 20px 0;
         }
-        .btn-primary:active {
-            transform: translateY(6px);
-            box-shadow: 0 4px 0 #0f2b6e;
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            transform: translateY(5px);
-            box-shadow: 0 5px 0 #0f2b6e;
-            pointer-events: none;
+        .call-button:active {
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #15803d;
         }
         .hint {
-            color: #334155;
-            font-size: 15px;
-            background: #f1f5f9b3;
+            color: #64748b;
+            font-size: 14px;
+            background: #f8fafc;
+            padding: 12px;
             border-radius: 40px;
-            padding: 12px 18px;
-            margin-top: 28px;
-            border: 1px solid #ffffff;
-        }
-        .status-message {
-            min-height: 28px;
-            margin: 10px 0 0 0;
-            font-size: 16px;
-            font-weight: 500;
-            color: #166534;
-        }
-        .footer-note {
-            margin-top: 32px;
-            color: #6b7280;
-            font-size: 13px;
-            border-top: 1px solid #cbd5e180;
-            padding-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="car-icon">🚗</div>
-        <h1>需要挪一下车</h1>
-        <div class="sub">轻点按钮 · 微信提醒车主</div>
+        <h1>需要挪车</h1>
+        <div class="sub">请直接联系车主</div>
 
-        <!-- 联系方式区域（点击按钮后显示） -->
-        <div id="contactDisplay" class="phone-number" style="display: none;">📞 13855715529</div>
+        <div class="phone-number" id="phoneDisplay">📞 138-0000-1111</div>
 
-        <!-- 主要操作按钮 -->
-        <button class="btn-primary" id="notifyBtn">
-            <span>🔔</span> 通知车主
-        </button>
-
-        <!-- 状态提示区 -->
-        <div id="statusMessage" class="status-message"></div>
+        <a href="tel:13800001111" id="callLink" class="call-button">
+            📲 点击直接呼叫
+        </a>
 
         <div class="hint">
-            ⚡️ 点击后，车主微信将收到挪车提醒<br>(为保护隐私，号码需点击按钮后显示)
-        </div>
-        <div class="footer-note">
-            扫码即通知 · 无需加好友
+            点击上方按钮即可拨打，无需手动输入号码
         </div>
     </div>
 
     <script>
-        // ------------------ 配置区域（请务必替换成你的信息）------------------
-        // 在WxPusher后台获取的appToken
-        const APP_TOKEN = "AT_FMcjiy616psL5VVUkQd7np2nt1KxGTDf"; 
-        // 在WxPusher后台获取的你自己的UID
-        const MY_UID = "UID_79q16XSMfYYfFzRiR4cAa0vxA8or"; 
-        // 你的真实手机号（显示在页面上）
-        const YOUR_PHONE = "13855715529"; 
-        // -----------------------------------------------------------------
+        // 在这里填写你的真实手机号（仅数字，不要有横线）
+        const YOUR_PHONE = "13800001111";  // ← 修改为你的号码
 
-        const notifyBtn = document.getElementById('notifyBtn');
-        const statusEl = document.getElementById('statusMessage');
-        const contactEl = document.getElementById('contactDisplay');
-
-        // 发送微信通知的函数
-        async function sendWxPusherMessage() {
-            // 准备要发送的消息内容 (支持HTML格式)
-            const content = `
-                <h3>🚨 您的爱车需要挪位</h3>
-                <p>有人在等待，请尽快前往处理。</p>
-                <p>⏰ 时间：${new Date().toLocaleString('zh-CN', { timeStyle: 'short', dateStyle: 'short' })}</p>
-                <p>🙏 谢谢配合</p>
-            `;
-            // 微信通知卡片上显示的摘要（微信限制20字左右，所以摘要短一点）
-            const summary = "🚗 有人扫码通知挪车";
-
-            // API地址
-            const url = 'https://wxpusher.zjiecode.com/api/send/message';
-
-            // 请求参数
-            const params = {
-                appToken: APP_TOKEN,
-                content: content,
-                summary: summary,           // 消息摘要 [citation:3][citation:9]
-                contentType: 2,              // 2表示HTML格式内容 [citation:3][citation:8]
-                uids: [MY_UID],              // 接收者的UID [citation:2][citation:8]
-                url: "https://wxpusher.zjiecode.com",  // 点击卡片跳转链接（可改为你自己的项目地址）
-                verifyPay: false
-            };
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(params)
-                });
-                const data = await response.json();
-                return data; // 返回接口调用结果
-            } catch (error) {
-                console.error('网络请求失败:', error);
-                throw error;
+        // 格式化显示（加横线更好看）
+        function formatPhone(phone) {
+            if (phone.length === 11) {
+                return phone.slice(0,3) + '-' + phone.slice(3,7) + '-' + phone.slice(7);
             }
+            return phone;
         }
 
-        // 按钮点击事件
-        notifyBtn.addEventListener('click', async function() {
-            // 防止重复点击
-            if (notifyBtn.disabled) return;
-
-            // 1. 立刻显示电话号码
-            contactEl.style.display = 'block';
-            contactEl.innerText = `📞 ${YOUR_PHONE}`; // 动态填入真实号码
-
-            // 2. 更新按钮状态为“发送中”
-            notifyBtn.disabled = true;
-            notifyBtn.innerHTML = `<span>⏳</span> 正在通知车主...`;
-            statusEl.innerText = ''; // 清空旧状态
-
-            // 3. 调用API发送微信通知
-            try {
-                const result = await sendWxPusherMessage();
-                // 根据返回的code判断是否成功 [citation:8][citation:9]
-                if (result && result.code === 1000) {
-                    statusEl.innerText = '✅ 车主微信已收到提醒！';
-                    statusEl.style.color = '#166534';
-                } else {
-                    // 失败提示（但依旧显示了号码，不影响挪车）
-                    statusEl.innerText = '⚠️ 提醒发送失败，但号码已显示，可直接拨打。';
-                    statusEl.style.color = '#b45309';
-                    console.warn('wxpusher 返回异常', result);
-                }
-            } catch (error) {
-                statusEl.innerText = '⚠️ 网络错误，但号码已显示，可直接拨打。';
-                statusEl.style.color = '#b45309';
-            } finally {
-                // 4. 最终调整按钮文字（不必恢复禁用状态，因为号码已经显示了，防止再点）
-                notifyBtn.innerHTML = `<span>🔔</span> 已通知 (可再次拨打)`;
-                // 如果想允许再次发送，可以在这里启用按钮，但号码已经显示，其实无妨。
-                // 此处保留禁用状态，让界面更简洁。如果希望可以重新通知，将下一行注释去掉即可。
-                // notifyBtn.disabled = false; 
-            }
-        });
+        document.getElementById('phoneDisplay').innerText = '📞 ' + formatPhone(YOUR_PHONE);
+        document.getElementById('callLink').href = 'tel:' + YOUR_PHONE;
     </script>
 </body>
 </html>
