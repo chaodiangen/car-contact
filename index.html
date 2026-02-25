@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>挪车联系 · 一键拨号</title>
+    <title>挪车联系 · 隐私保护版</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -46,6 +46,7 @@
             color: #1e3a8a;
             border: 2px solid #a5b4fc;
             margin: 20px 0;
+            display: none; /* 初始隐藏 */
         }
         .call-button {
             display: block;
@@ -59,6 +60,9 @@
             box-shadow: 0 8px 0 #15803d;
             transition: 0.1s;
             margin: 20px 0;
+            border: none;
+            width: 100%;
+            cursor: pointer;
         }
         .call-button:active {
             transform: translateY(4px);
@@ -77,24 +81,29 @@
     <div class="card">
         <div class="car-icon">🚗</div>
         <h1>需要挪车</h1>
-        <div class="sub">请直接联系车主</div>
+        <div class="sub">点击下方按钮获取车主号码</div>
 
-        <div class="phone-number" id="phoneDisplay">📞 138-0000-1111</div>
+        <!-- 电话号码显示区（初始隐藏） -->
+        <div class="phone-number" id="phoneDisplay"></div>
 
-        <a href="tel:13800001111" id="callLink" class="call-button">
-            📲 点击直接呼叫
-        </a>
+        <!-- 按钮：点击后解码并显示号码，同时更新拨号链接 -->
+        <button class="call-button" id="revealBtn">
+            📲 点击显示号码并拨打
+        </button>
+
+        <!-- 隐藏的拨号链接（点击按钮后设置） -->
+        <a href="javascript:void(0);" id="callLink" style="display: none;">拨打</a>
 
         <div class="hint">
-            点击上方按钮即可拨打，无需手动输入号码
+            点击按钮后号码才会显示，保护隐私
         </div>
     </div>
 
     <script>
-        // 在这里填写你的真实手机号（仅数字，不要有横线）
-        const YOUR_PHONE = "13800001111";  // ← 修改为你的号码
+        // 你的手机号经过 Base64 编码（13855715529 编码后为 MTM4NTU3MTU1Mjk=）
+        const ENCODED_PHONE = "MTM4NTU3MTU1Mjk=";
 
-        // 格式化显示（加横线更好看）
+        // 格式化显示为 138-5571-5529
         function formatPhone(phone) {
             if (phone.length === 11) {
                 return phone.slice(0,3) + '-' + phone.slice(3,7) + '-' + phone.slice(7);
@@ -102,8 +111,38 @@
             return phone;
         }
 
-        document.getElementById('phoneDisplay').innerText = '📞 ' + formatPhone(YOUR_PHONE);
-        document.getElementById('callLink').href = 'tel:' + YOUR_PHONE;
+        // 解码函数
+        function decodePhone(encoded) {
+            try {
+                return atob(encoded);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const realPhone = decodePhone(ENCODED_PHONE);
+        if (!realPhone) {
+            alert('号码解码失败，请联系管理员');
+        }
+
+        const phoneDisplay = document.getElementById('phoneDisplay');
+        const revealBtn = document.getElementById('revealBtn');
+        const callLink = document.getElementById('callLink');
+
+        revealBtn.addEventListener('click', function() {
+            // 显示号码
+            phoneDisplay.style.display = 'block';
+            phoneDisplay.innerText = '📞 ' + formatPhone(realPhone);
+            
+            // 设置拨号链接
+            callLink.href = 'tel:' + realPhone;
+            
+            // 将按钮变为直接拨号按钮
+            revealBtn.textContent = '📞 点击直接拨打';
+            revealBtn.onclick = function() {
+                window.location.href = 'tel:' + realPhone;
+            };
+        });
     </script>
 </body>
 </html>
