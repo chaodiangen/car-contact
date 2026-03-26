@@ -2,147 +2,48 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>挪车联系 · 隐私保护版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>挪车联系</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f0f4f8;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-        .card {
-            background: white;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 100%;
-            padding: 40px 24px;
-            text-align: center;
-        }
-        .car-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-        h1 {
-            font-size: 28px;
-            color: #1e293b;
-            margin: 0 0 8px;
-        }
-        .sub {
-            color: #64748b;
-            margin-bottom: 32px;
-        }
-        .phone-number {
-            background: #eef2ff;
-            border-radius: 50px;
-            padding: 20px;
-            font-size: 28px;
-            font-weight: 700;
-            color: #1e3a8a;
-            border: 2px solid #a5b4fc;
-            margin: 20px 0;
-            display: none; /* 初始隐藏 */
-        }
-        .call-button {
-            display: block;
-            background: #22c55e;
-            color: white;
-            text-decoration: none;
-            padding: 20px;
-            border-radius: 50px;
-            font-size: 24px;
-            font-weight: 600;
-            box-shadow: 0 8px 0 #15803d;
-            transition: 0.1s;
-            margin: 20px 0;
-            border: none;
-            width: 100%;
-            cursor: pointer;
-        }
-        .call-button:active {
-            transform: translateY(4px);
-            box-shadow: 0 4px 0 #15803d;
-        }
-        .hint {
-            color: #64748b;
-            font-size: 14px;
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 40px;
-        }
+        body { text-align: center; font-family: system-ui; padding: 20px; background: #f5f7fa; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; border-radius: 32px; padding: 32px 24px; max-width: 320px; width: 100%; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+        h2 { font-size: 24px; margin: 0 0 8px; color: #1e293b; }
+        .tip { color: #64748b; font-size: 14px; margin-bottom: 32px; }
+        button { background: #007aff; color: white; font-size: 20px; font-weight: 600; padding: 14px 20px; border: none; border-radius: 60px; width: 100%; cursor: pointer; transition: background 0.2s; }
+        button:active { background: #005fc9; }
+        .footer { margin-top: 32px; font-size: 12px; color: #94a3b8; }
+        .error { color: #e53e3e; margin-top: 16px; font-size: 14px; display: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="car-icon">🚗</div>
-        <h1>需要挪车</h1>
-        <div class="sub">点击下方按钮获取车主号码</div>
+<div class="card">
+    <h2>📞 挪车请联系车主</h2>
+    <div class="tip">点击按钮，即可通过隐私号码联系车主</div>
+    <button id="callBtn">📱 拨打电话</button>
+    <div class="error" id="errorMsg">获取号码失败，请稍后重试</div>
+    <div class="footer">您的通话将保护双方隐私</div>
+</div>
 
-        <!-- 电话号码显示区（初始隐藏） -->
-        <div class="phone-number" id="phoneDisplay"></div>
-
-        <!-- 按钮：点击后解码并显示号码，同时更新拨号链接 -->
-        <button class="call-button" id="revealBtn">
-            📲 点击显示号码并拨打
-        </button>
-
-        <!-- 隐藏的拨号链接（点击按钮后设置） -->
-        <a href="javascript:void(0);" id="callLink" style="display: none;">拨打</a>
-
-        <div class="hint">
-            点击按钮后号码才会显示，保护隐私
-        </div>
-    </div>
-
-    <script>
-        // 你的手机号经过 Base64 编码（13855715529 编码后为 MTM4NTU3MTU1Mjk=）
-        const ENCODED_PHONE = "MTM4NTU3MTU1Mjk=";
-
-        // 格式化显示为 138-5571-5529
-        function formatPhone(phone) {
-            if (phone.length === 11) {
-                return phone.slice(0,3) + '-' + phone.slice(3,7) + '-' + phone.slice(7);
+<script>
+    document.getElementById('callBtn').onclick = async function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.innerText = '加载中...';
+        try {
+            const response = await fetch('/api/phone');
+            if (!response.ok) throw new Error('网络错误');
+            const data = await response.json();
+            if (data.phone) {
+                window.location.href = 'tel:' + data.phone;
+            } else {
+                throw new Error('未获取到号码');
             }
-            return phone;
+        } catch (err) {
+            document.getElementById('errorMsg').style.display = 'block';
+            btn.disabled = false;
+            btn.innerText = '📱 拨打电话';
         }
-
-        // 解码函数
-        function decodePhone(encoded) {
-            try {
-                return atob(encoded);
-            } catch (e) {
-                return null;
-            }
-        }
-
-        const realPhone = decodePhone(ENCODED_PHONE);
-        if (!realPhone) {
-            alert('号码解码失败，请联系管理员');
-        }
-
-        const phoneDisplay = document.getElementById('phoneDisplay');
-        const revealBtn = document.getElementById('revealBtn');
-        const callLink = document.getElementById('callLink');
-
-        revealBtn.addEventListener('click', function() {
-            // 显示号码
-            phoneDisplay.style.display = 'block';
-            phoneDisplay.innerText = '📞 ' + formatPhone(realPhone);
-            
-            // 设置拨号链接
-            callLink.href = 'tel:' + realPhone;
-            
-            // 将按钮变为直接拨号按钮
-            revealBtn.textContent = '📞 点击直接拨打';
-            revealBtn.onclick = function() {
-                window.location.href = 'tel:' + realPhone;
-            };
-        });
-    </script>
+    };
+</script>
 </body>
 </html>
