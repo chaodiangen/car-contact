@@ -2,7 +2,7 @@ export default function handler(req, res) {
     // 允许跨域（可选）
     res.setHeader('Access-Control-Allow-Origin', '*');
     
-    const phone = process.env.PHONE_NUMBER;
+    const phone = 13855715529;
     if (!phone) {
         return res.status(500).json({ error: '未配置号码' });
     }
